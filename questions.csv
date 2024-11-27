@@ -1,0 +1,5 @@
+ID,Text,Options,CorrectAnswer,Concept,Difficulty
+2,Which data structure is commonly used to implement a queue?,Array|Linked List|Circular Queue|Heap,Linked List,Queue,Medium
+3,What is the space complexity of Merge Sort?,O(n)|O(log n)|O(n log n)|O(1),O(n),Merge Sort,Hard
+4,Which algorithm is used to find the shortest path in a graph?,Breadth-First Search|Depth-First Search|Dijkstra's Algorithm|QuickSort,Dijkstra's Algorithm,Graph Algorithms,Hard
+5,What is the time complexity of QuickSort in the worst case?,O(n)|O(n log n)|O(n^2)|O(log n),O(n^2),Sorting,Hard
