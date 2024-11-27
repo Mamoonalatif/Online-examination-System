@@ -1,4 +1,3 @@
-
 import streamlit as st
 import subprocess
 
@@ -9,20 +8,20 @@ st.markdown(
     """
     <style>
     body {
-        background-color: #F0F5F0; /* White with a hint of green */
-        color: #333; /* Darker text for better readability */
-        text-align: center;  /* Center-align all text */
+        background-color: #FFFFF; 
+        color: #FFFFF; 
+        text-align: center;  
     }
     .stButton button {
-        background-color: #1F4D36; /* Panda green */
+        background-color: #1F4D36; 
         color: white;
         border-radius: 5px;
         border: 2px solid #1F4D36;
         font-size: 16px;
         font-weight: bold;
         padding: 10px;
-        display: inline-block; /* Ensure buttons are inline */
-        margin: 10px 0; /* Add some margin to buttons for spacing */
+        display: inline-block;
+        margin: 10px 0; 
     }
     .stButton button:hover {
         background-color: #FFFFFF;
@@ -34,8 +33,8 @@ st.markdown(
         font-weight: bold;
         color: #1F4D36;
         padding: 10px;
-        text-align: center; /* Center-align headings */
-        margin-top: 20px; /* Add some margin for better spacing */
+        text-align: center; 
+        margin-top: 20px;
     }
     .subheader {
         font-size: 20px;
@@ -54,7 +53,7 @@ if "show_register_form" not in st.session_state:
     st.session_state.show_register_form = False  # Initially, show login form
 
 # Header
-st.markdown('<div class="header">🐼 Welcome to Panda Exam System 🐼</div>', unsafe_allow_html=True)
+st.markdown('<div class="header">🐼 Welcome to PandaProctor🐼</div>', unsafe_allow_html=True)
 
 # Form toggle logic
 if not st.session_state.show_register_form:
