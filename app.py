@@ -1,16 +1,17 @@
+
 import streamlit as st
 import subprocess
 
 # Set page configuration (only once at the start)
 st.set_page_config(page_title="Login Page", page_icon="🐼", layout="centered")
 
-# Apply Panda-themed CSS
 st.markdown(
     """
     <style>
     body {
         background-color: #F0F5F0; /* White with a hint of green */
         color: #333; /* Darker text for better readability */
+        text-align: center;  /* Center-align all text */
     }
     .stButton button {
         background-color: #1F4D36; /* Panda green */
@@ -20,23 +21,25 @@ st.markdown(
         font-size: 16px;
         font-weight: bold;
         padding: 10px;
+        display: inline-block; /* Ensure buttons are inline */
+        margin: 10px 0; /* Add some margin to buttons for spacing */
     }
     .stButton button:hover {
         background-color: #FFFFFF;
         color: #1F4D36;
         border: 2px solid #1F4D36;
     }
-    .header {
+    .header, .subheader {
         font-size: 36px;
         font-weight: bold;
-        text-align: center;
         color: #1F4D36;
         padding: 10px;
+        text-align: center; /* Center-align headings */
+        margin-top: 20px; /* Add some margin for better spacing */
     }
     .subheader {
         font-size: 20px;
         font-weight: bold;
-        text-align: center;
         color: #333;
         padding: 5px;
     }
@@ -44,6 +47,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
 
 # Check session state for toggling between login and register
 if "show_register_form" not in st.session_state:
