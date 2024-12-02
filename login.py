@@ -76,7 +76,7 @@ if not st.session_state.show_register_form:
         if username and password:
             try:
                 result = subprocess.run(
-                    ['./main', 'login', user_type, username, password],
+                    ['./login', 'login', user_type, username, password],
                     capture_output=True, text=True, check=True
                 )
                 st.success(result.stdout)
@@ -108,7 +108,7 @@ else:
         if register_username and register_password:
             try:
                 result = subprocess.run(
-                    ['./main', 'register', register_user_type, register_username, register_password],
+                    ['./login', 'register', register_user_type, register_username, register_password],
                     capture_output=True, text=True, check=True
                 )
                 st.success(result.stdout)
