@@ -1,138 +1,88 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <sstream>
 using namespace std;
 
-// Define the structure of a basic hashmap (simple key-value store)
 struct HashMap
-{
-    struct Node
+{   struct Node
     {
-        string key;
-        string value;
+        string key, value;
         Node *next;
     };
+    Node *table[100];
 
-    Node *table[100]; // A simple array of linked lists for hash buckets
+    HashMap() { fill(begin(table), end(table), nullptr); }
 
-    // Constructor to initialize hash table
-    HashMap()
-    {
-        for (int i = 0; i < 100; i++)
-        {
-            table[i] = nullptr;
-        }
-    }
-
-    // Hash function to get the index based on the key (username)
     int hashFunction(const string &key)
     {
         int hash = 0;
         for (char c : key)
-        {
             hash = (hash + c) % 100;
-        }
         return hash;
-    }
+    }//hashFunction
 
-    // Insert a key-value pair into the hashmap
     void insert(const string &key, const string &value)
     {
         int index = hashFunction(key);
-        Node *newNode = new Node{key, value, table[index]};
-        table[index] = newNode;
-    }
+        table[index] = new Node{key, value, table[index]};
+    }//insert
 
-    // Search for a key in the hashmap and return the associated value (password)
     string search(const string &key)
     {
         int index = hashFunction(key);
-        Node *current = table[index];
-        while (current != nullptr)
-        {
+        for (Node *current = table[index]; current; current = current->next)
             if (current->key == key)
-            {
                 return current->value;
-            }
-            current = current->next;
-        }
-        return ""; // Return empty string if not found
-    }
+        return "";
+    }//search
 
-    // Save the credentials to a file
     void saveToFile(const string &filename)
     {
         ofstream file(filename, ios::app);
         for (int i = 0; i < 100; i++)
-        {
-            Node *current = table[i];
-            while (current != nullptr)
-            {
+            for (Node *current = table[i]; current; current = current->next)
                 file << current->key << " " << current->value << "\n";
-                current = current->next;
-            }
-        }
-    }
+    }//savetoFile
 
-    // Load credentials from a file into the hashmap
     void loadFromFile(const string &filename)
     {
         ifstream file(filename);
         string username, password;
         while (file >> username >> password)
-        {
             insert(username, password);
-        }
-    }
+    }//loadfromfile
 };
 
 int main(int argc, char *argv[])
 {
     if (argc != 5)
     {
-        cout << "Usage: ./main <action> <user_type> <username> <password>" << endl;
+        cout << "Usage: ./main <action> <user_type> <username> <password>\n";
         return 1;
     }
 
-    string action = argv[1];
-    string userType = argv[2];
-    string username = argv[3];
-    string password = argv[4];
-
-    // Determine the filename based on user type
+    string action = argv[1], userType = argv[2];
+    string username = argv[3], password = argv[4];
     string filename = (userType == "Student") ? "Student.txt" : "Admin.txt";
 
-    // Create an instance of the HashMap
     HashMap map;
-    map.loadFromFile(filename); // Load existing credentials from the file
+    map.loadFromFile(filename);
 
     if (action == "login")
     {
-        // Check if the credentials are valid for login
         string storedPassword = map.search(username);
-        if (storedPassword != "" && storedPassword == password)
-        {
-            cout << "Login successful!" << endl;
-        }
-        else
-        {
-            cout << "Invalid username or password." << endl;
-        }
+        cout << (storedPassword == password ? "Login successful!" : "Invalid username or password.") << endl;
     }
     else if (action == "register")
     {
-        // Register new user
-        if (map.search(username) == "")
+        if (map.search(username).empty())
         {
             map.insert(username, password);
-            map.saveToFile(filename); // Save the new credentials to the file
+            map.saveToFile(filename);
             cout << "Registration successful!" << endl;
         }
         else
-        {
             cout << "Username already exists." << endl;
-        }
     }
     else
     {
