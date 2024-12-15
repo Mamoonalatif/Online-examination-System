@@ -1,0 +1,30 @@
+ID,Text,Options,CorrectAnswer,Concept,Difficulty
+1,What is the time complexity of Binary Search?,O(n)|O(log n)|O(n^2)|O(1),O(log n),Binary Search,Easy,DSA
+2,Which data structure is used to implement a queue?,Array|Linked List|Stack|Heap,Linked List,Queue,Medium,DSA
+3,What is the space complexity of Merge Sort?,O(n)|O(log n)|O(n log n)|O(1),O(n),Merge Sort,Hard,DSA
+5,What is the time complexity of QuickSort in the worst case?,O(n)|O(n log n)|O(n^2)|O(log n),O(n^2),Sorting,Hard,DSA
+6,Which data structure is used to implement a priority queue?,Array|Heap|Linked List|Stack,Heap,Priority Queue,Medium,DSA
+7,What is the best-case time complexity of Bubble Sort?,O(n)|O(n log n)|O(n^2)|O(1),O(n),Sorting,Easy,DSA
+8,What does BFS stand for?,Breadth-First Search|Binary First Search|Best First Search|Bubble First Sort,Breadth-First Search,Graph Algorithms,Medium,DSA
+9,What is the space complexity of the Breadth-First Search algorithm?,O(n)|O(n log n)|O(log n)|O(1),O(n),Graph Algorithms,Medium,DSA
+10,Which of the following is a divide and conquer algorithm?,QuickSort|Bubble Sort|Selection Sort|Insertion Sort,QuickSort,Sorting,Medium,DSA
+11,Which of the following is the correct syntax for a for loop?,for(i=0; i<5; i++)|for(i=0; i<5; i++){}|for(i=0; i<5; i){}|None of the above,for(i=0; i<5; i++),For Loops,Easy,PF
+12,What is the correct data type to store a single character in C++?,char|int|string|float,char,Data Types,Easy,PF
+13,Which of the following is used to break out of a loop?,break|continue|exit|return,break,Loop Control,Easy,PF
+14,Which operator is used to compare two values in C++?,=|==|<>|!=,==,Operators,Easy,PF
+15,Which of these is the correct syntax to define a function in C++?,void function()|function void()|void function{}|function() void{},void function(),Functions,Medium,PF
+16,What is the output of 'cout << 10 / 3;' in C++?,3|3.33|Error|10/3,3,Basic Output,Easy,PF
+17,Which keyword is used to define a constant value?,const|final|static|define,const,Constants,Medium,PF
+18,Which of the following is NOT a valid data type in C++?,int|double|string|number,number,Data Types,Easy,PF
+19,How can you access a member of a class in C++?,.|::|->|*,.,Class Access,Medium,PF
+20,What is the default value of an uninitialized static variable?,0|NULL|undefined|Random Value,0,Static Variables,Medium,PF
+21,What is inheritance in OOP?,Ability to create new classes from existing ones|Ability to modify private variables|Ability to share methods between classes|Ability to create new instances,Ability to create new classes from existing ones,Inheritance,Hard,OOP
+22,Which of the following is NOT a feature of OOP?,Encapsulation|Abstraction|Inheritance|Polymorphism,None,OOP Features,Easy,OOP
+23,Which OOP principle allows an object to take on multiple forms?,Polymorphism|Abstraction|Inheritance|Encapsulation,Polymorphism,Polymorphism,Hard,OOP
+24,Which OOP principle allows hiding implementation details?,Encapsulation|Abstraction|Inheritance|Polymorphism,Abstraction,OOP Principles,Hard,OOP
+25,What is a constructor in C++?,A special method for initializing objects|A method to destroy objects|A method to declare variables|A method to display output,A special method for initializing objects,Constructor,Medium,OOP
+26,What is the purpose of the 'this' pointer in C++?,To refer to the current object|To store a pointer to a member variable|To create a new object|To delete an object,To refer to the current object,This Pointer,Medium,OOP
+27,What is polymorphism in OOP?,Objects taking multiple forms|Objects hiding data|Objects inheriting properties|Objects using multiple classes,Objects taking multiple forms,Polymorphism,Hard,OOP
+28,What is a virtual function?,A function that can be overridden in derived classes|A function that cannot be overridden|A function without any implementation|A function used for destructors,A function that can be overridden in derived classes,Virtual Functions,Hard,OOP
+29,What is an abstract class?,A class that cannot be instantiated|A class with no methods|A class with only private methods|A class with no data members,A class that cannot be instantiated,Abstract Classes,Medium,OOP
+30,What is the purpose of encapsulation?,To hide the internal state and protect the data|To allow inheritance|To implement polymorphism|To provide abstraction,To hide the internal state and protect the data,Encapsulation,Hard,OOP
