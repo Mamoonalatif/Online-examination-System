@@ -6,193 +6,242 @@
 
 using namespace std;
 
-struct Question
-{
+// Node for the doubly linked list to store questions
+struct QuestionNode {
     int id;
     string text;
     vector<string> options;
     string correctAnswer;
     string concept;
     string difficulty;
+    string course;
+    QuestionNode* next;
+    QuestionNode* prev;
 
-    Question(int id, string text, vector<string> options, string correctAnswer, string concept, string difficulty)
-        : id(id), text(text), options(options), correctAnswer(correctAnswer), concept(concept), difficulty(difficulty) {}
+    QuestionNode(int id, const string& text, const vector<string>& options,
+                 const string& correctAnswer, const string& concept, const string& difficulty, const string& course)
+        : id(id), text(text), options(options), correctAnswer(correctAnswer),
+          concept(concept), difficulty(difficulty), course(course), next(nullptr), prev(nullptr) {}
 };
 
-void writeQuestionsToFile(const vector<Question> &questions, const string &filename)
-{
-    ofstream file(filename);
-    if (!file.is_open())
-    {
-        cout << "Failed to open file for writing!" << endl;
+// Doubly Linked List to manage questions
+class QuestionList {
+private:
+    QuestionNode* head;
+    QuestionNode* tail;
+
+    QuestionNode* findQuestionById(int id) {
+        QuestionNode* current = head;
+        while (current) {
+            if (current->id == id)
+                return current;
+            current = current->next;
+        }
+        return nullptr;
+    }
+
+public:
+    QuestionList() : head(nullptr), tail(nullptr) {}
+
+    void addQuestion(int id, const string& text, const vector<string>& options,
+                 const string& correctAnswer, const string& concept, const string& difficulty, const string& course) {
+    if (findQuestionById(id)) {
+        cout << "Warning: Question with ID " << id << " already exists.\n";
         return;
     }
+    QuestionNode* newNode = new QuestionNode(id, text, options, correctAnswer, concept, difficulty, course);
 
-    file << "ID,Text,Options,CorrectAnswer,Concept,Difficulty\n";
-
-    for (const auto &q : questions)
-    {
-        file << q.id << "," << q.text << ",";
-        for (size_t i = 0; i < q.options.size(); ++i)
-        {
-            file << q.options[i];
-            if (i != q.options.size() - 1)
-                file << "|"; // Separate options with "|"
-        }
-        file << "," << q.correctAnswer << "," << q.concept << "," << q.difficulty << "\n";
+    if (!head) {
+        head = tail = newNode;
+    } else {
+        tail->next = newNode;
+        newNode->prev = tail;
+        tail = newNode;
     }
-
-    file.close();
-    cout << "Questions saved to file successfully!" << endl;
 }
 
-void loadQuestionsFromFile(vector<Question> &questions, const string &filename)
-{
+
+    void modifyQuestion(int id, const string& newText, const vector<string>& newOptions,
+                        const string& newCorrectAnswer, const string& newConcept, const string& newDifficulty, const string& newCourse) {
+        QuestionNode* q = findQuestionById(id);
+        if (q) {
+            q->text = newText;
+            q->options = newOptions;
+            q->correctAnswer = newCorrectAnswer;
+            q->concept = newConcept;
+            q->difficulty = newDifficulty;
+            q->course = newCourse;
+            cout << "Question with ID " << id << " has been modified successfully.\n";
+        } else {
+            cout << "Question with ID " << id << " not found.\n";
+        }
+    }
+
+    void deleteQuestion(int id) {
+        QuestionNode* q = findQuestionById(id);
+        if (q) {
+            if (q->prev)
+                q->prev->next = q->next;
+            else
+                head = q->next;
+
+            if (q->next)
+                q->next->prev = q->prev;
+            else
+                tail = q->prev;
+
+            delete q;
+            cout << "Question with ID " << id << " has been deleted successfully.\n";
+        } else {
+            cout << "Question with ID " << id << " not found.\n";
+        }
+    }
+
+    void displayQuestions() {
+        QuestionNode* current = head;
+        while (current) {
+            printQuestion(current);
+            current = current->next;
+        }
+    }
+
+    void printQuestion(QuestionNode* q) {
+        cout << "ID: " << q->id << "\nText: " << q->text << "\nOptions: ";
+        for (const auto& opt : q->options) {
+            cout << opt << " ";
+        }
+        cout << "\nCorrect Answer: " << q->correctAnswer << "\nConcept: " << q->concept
+             << "\nDifficulty: " << q->difficulty << "\nCourse: " << q->course << "\n" << endl;
+    }
+
+    void loadQuestionsFromCSV(const string& filename) {
     ifstream file(filename);
-    if (!file.is_open())
-    {
-        cout << "Failed to open file for reading!" << endl;
+    if (!file.is_open()) {
+        cout << "Error: Could not open file " << filename << endl;
         return;
     }
 
     string line;
-    getline(file, line);
+    int lineNumber = 0;
 
-    while (getline(file, line))
-    {
-        stringstream ss(line);
-        string id_str, text, options_str, correctAnswer, concept, difficulty;
-        vector<string> options;
+    while (getline(file, line)) {
+        lineNumber++;
 
-        getline(ss, id_str, ',');
-        getline(ss, text, ',');
-        getline(ss, options_str, ',');
-        getline(ss, correctAnswer, ',');
-        getline(ss, concept, ',');
-        getline(ss, difficulty);
-
-        // Parse options
-        stringstream options_ss(options_str);
-        string option;
-        while (getline(options_ss, option, '|'))
-        {
-            options.push_back(option);
+        if (line.empty()) {
+            cout << "Warning: Skipping empty line at line " << lineNumber << endl;
+            continue;
         }
 
-        int id = stoi(id_str);
+        stringstream ss(line);
+        string idStr, text, optionsStr, correctAnswer, concept, difficulty, course;
 
-        Question newQuestion(id, text, options, correctAnswer, concept, difficulty);
-        questions.push_back(newQuestion);
+        // Parse fields
+        if (!getline(ss, idStr, ',') || !getline(ss, text, ',') || !getline(ss, optionsStr, ',') ||
+            !getline(ss, correctAnswer, ',') || !getline(ss, concept, ',') ||
+            !getline(ss, difficulty, ',') || !getline(ss, course, ',')) {
+            cout << "Warning: Skipping malformed line at line " << lineNumber << ": " << line << endl;
+            continue;
+        }
+
+        // Validate and convert ID
+        try {
+            int id = stoi(idStr);
+
+            // Parse options
+            vector<string> options;
+            stringstream optionsStream(optionsStr);
+            string option;
+            while (getline(optionsStream, option, '|')) {
+                options.push_back(option);
+            }
+
+            // Add question to the list
+            addQuestion(id, text, options, correctAnswer, concept, difficulty, course);
+        } catch (const invalid_argument& e) {
+            cout << "Error: Invalid ID at line " << lineNumber << ": " << idStr << endl;
+        } catch (const out_of_range& e) {
+            cout << "Error: ID out of range at line " << lineNumber << ": " << idStr << endl;
+        }
     }
 
     file.close();
-    cout << "Questions loaded from file successfully!" << endl;
+    cout << "Questions loaded successfully from " << filename << endl;
 }
 
-void addQuestion(vector<Question> &questions, int id, const string &text, const vector<string> &options,
-                 const string &correctAnswer, const string &concept, const string &difficulty)
-{
-    Question newQuestion(id, text, options, correctAnswer, concept, difficulty);
-    questions.push_back(newQuestion);
-    cout << "Question added successfully!" << endl;
-}
 
-void displayQuestions(const vector<Question> &questions)
-{
-    for (const auto &q : questions)
-    {
-        cout << "ID: " << q.id << "\nText: " << q.text << "\nOptions:\n";
-        for (const auto &option : q.options)
-        {
-            cout << "  - " << option << "\n";
+    void writeQuestionsToFile(const string& filename) {
+        ofstream file(filename);
+        if (!file.is_open()) {
+            cout << "Error: Could not open file " << filename << " for writing." << endl;
+            return;
         }
-        cout << "Correct Answer: " << q.correctAnswer << "\nConcept: " << q.concept
-             << "\nDifficulty: " << q.difficulty << "\n\n";
-    }
-}
+  file << "ID,Text,Options,CorrectAnswer,Concept,Difficulty\n";
+        QuestionNode* current = head;
+        while (current) {
+            file << current->id << "," << current->text << ",";
 
-Question *findQuestionById(vector<Question> &questions, int id)
-{
-    for (auto &q : questions)
-    {
-        if (q.id == id)
-        {
-            return &q;
-        }
-    }
-    return nullptr;
-}
-
-void updateQuestion(vector<Question> &questions, int id, const string &newText, const vector<string> &newOptions,
-                    const string &newCorrectAnswer, const string &newConcept, const string &newDifficulty)
-{
-    Question *q = findQuestionById(questions, id);
-    if (q)
-    {
-        q->text = newText;
-        q->options = newOptions;
-        q->correctAnswer = newCorrectAnswer;
-        q->concept = newConcept;
-        q->difficulty = newDifficulty;
-        cout << "Question updated successfully!" << endl;
-    }
-    else
-    {
-        cout << "Question with ID " << id << " not found!" << endl;
-    }
-}
-
-void deleteQuestion(vector<Question> &questions, int id)
-{
-    bool found = false;
-    for (size_t i = 0; i < questions.size(); ++i)
-    {
-        if (questions[i].id == id)
-        {
-            for (size_t j = i; j < questions.size() - 1; ++j)
-            {
-                questions[j] = questions[j + 1];
+            for (size_t i = 0; i < current->options.size(); ++i) {
+                file << current->options[i];
+                if (i < current->options.size() - 1)
+                    file << "|";
             }
-            questions.pop_back();
-            cout << "Question deleted successfully!" << endl;
-            found = true;
-            break;
+
+            file << "," << current->correctAnswer << "," << current->concept << ","
+                 << current->difficulty << "," << current->course << "\n";
+
+            current = current->next;
         }
+
+        file.close();
+        cout << "Questions written successfully to " << filename << endl;
     }
-    if (!found)
-    {
-        cout << "Question with ID " << id << " not found!" << endl;
-    }
-}
+};
 
-int main()
-{
-    vector<Question> questions;
+int main() {
+    QuestionList questionList;
+ // Load questions from CSV file
+    questionList.loadQuestionsFromCSV("questions.csv");
 
-    loadQuestionsFromFile(questions, "questions.csv");
+    // Adding 10 questions for DSA
+    questionList.addQuestion(1, "What is the time complexity of Binary Search?", {"O(n)", "O(log n)", "O(n^2)", "O(1)"}, "O(log n)", "Binary Search", "Easy", "DSA");
+    questionList.addQuestion(2, "Which data structure is used in BFS?", {"Stack", "Queue", "Heap", "Graph"}, "Queue", "Graph Traversal", "Medium", "DSA");
+    questionList.addQuestion(3, "What is the height of a complete binary tree with N nodes?", {"log N", "N", "log(N+1)-1", "N-1"}, "log(N+1)-1", "Binary Trees", "Hard", "DSA");
+    questionList.addQuestion(4, "Which algorithm is used for finding the shortest path in a graph?", {"DFS", "Dijkstra's", "Prim's", "Kruskal's"}, "Dijkstra's", "Graph Algorithms", "Medium", "DSA");
+    questionList.addQuestion(5, "What is a max heap?", {"Complete binary tree", "Tree with max root", "Tree with min root", "Heap without duplicates"}, "Tree with max root", "Heaps", "Easy", "DSA");
+    questionList.addQuestion(6, "What is the time complexity of quicksort in the worst case?", {"O(n log n)", "O(n^2)", "O(n)", "O(log n)"}, "O(n^2)", "Sorting", "Hard", "DSA");
+    questionList.addQuestion(7, "Which data structure supports LIFO?", {"Queue", "Deque", "Stack", "Heap"}, "Stack", "Stacks", "Easy", "DSA");
+    questionList.addQuestion(8, "Which traversal is used to print a binary search tree in sorted order?", {"Inorder", "Preorder", "Postorder", "Level-order"}, "Inorder", "Tree Traversal", "Medium", "DSA");
+    questionList.addQuestion(9, "Which of the following is not a stable sorting algorithm?", {"Bubble Sort", "Selection Sort", "Merge Sort", "Insertion Sort"}, "Selection Sort", "Sorting", "Hard", "DSA");
+    questionList.addQuestion(10, "Which data structure is used in recursion?", {"Queue", "Heap", "Stack", "Graph"}, "Stack", "Recursion", "Easy", "DSA");
 
-    // Adding DSA-related MCQs
-    addQuestion(questions, 1, "What is the time complexity of Binary Search?", {"O(n)", "O(log n)", "O(n^2)", "O(1)"}, "O(log n)", "Binary Search", "Easy");
-    addQuestion(questions, 2, "Which data structure is used to implement a queue?", {"Array", "Linked List", "Stack", "Heap"}, "Linked List", "Queue", "Medium");
-    addQuestion(questions, 3, "What is the space complexity of Merge Sort?", {"O(n)", "O(log n)", "O(n log n)", "O(1)"}, "O(n)", "Merge Sort", "Hard");
-    addQuestion(questions, 4, "Which algorithm is used to find the shortest path in a graph?", {"Breadth-First Search", "Depth-First Search", "Dijkstra's Algorithm", "QuickSort"}, "Dijkstra's Algorithm", "Graph Algorithms", "Hard");
-    addQuestion(questions, 5, "What is the time complexity of QuickSort in the worst case?", {"O(n)", "O(n log n)", "O(n^2)", "O(log n)"}, "O(n^2)", "Sorting", "Hard");
+    // Adding 10 questions for OOP
+    questionList.addQuestion(11, "What is a class in OOP?", {"Object", "Blueprint", "Method", "Variable"}, "Blueprint", "Basics", "Easy", "OOP");
+    questionList.addQuestion(12, "Which principle does inheritance follow?", {"Encapsulation", "Reusability", "Abstraction", "Polymorphism"}, "Reusability", "Inheritance", "Easy", "OOP");
+    questionList.addQuestion(13, "What is polymorphism?", {"Overloading", "Overriding", "Both", "None"}, "Both", "Polymorphism", "Medium", "OOP");
+    questionList.addQuestion(14, "What is encapsulation?", {"Hiding data", "Inheritance", "Method Overloading", "Abstraction"}, "Hiding data", "Basics", "Easy", "OOP");
+    questionList.addQuestion(15, "What is function overriding?", {"Same function name, different classes", "Same name, same parameters", "Different parameters", "None"}, "Same name, same parameters", "Polymorphism", "Medium", "OOP");
+    questionList.addQuestion(16, "Which keyword is used to inherit a class?", {"virtual", "private", "public", "protected"}, "public", "Inheritance", "Easy", "OOP");
+    questionList.addQuestion(17, "What does 'this' pointer represent?", {"Current object", "Base class", "Derived class", "None"}, "Current object", "Pointers", "Medium", "OOP");
+    questionList.addQuestion(18, "Which operator is used for dynamic memory allocation in C++?", {"new", "malloc", "alloc", "calloc"}, "new", "Dynamic Memory", "Easy", "OOP");
+    questionList.addQuestion(19, "Which of the following supports multiple inheritance?", {"C++", "Java", "Python", "C#"}, "C++", "Inheritance", "Hard", "OOP");
+    questionList.addQuestion(20, "What is the access specifier of private members in inheritance?", {"Accessible", "Not accessible", "Hidden", "Read-only"}, "Not accessible", "Inheritance", "Medium", "OOP");
 
-    cout << "All questions:\n";
-    displayQuestions(questions);
+    // Adding 10 questions for PF
+    questionList.addQuestion(21, "What is the size of an int in C++?", {"2 bytes", "4 bytes", "8 bytes", "16 bytes"}, "4 bytes", "Data Types", "Easy", "PF");
+    questionList.addQuestion(22, "Which loop executes at least once?", {"for", "while", "do-while", "none"}, "do-while", "Loops", "Easy", "PF");
+    questionList.addQuestion(23, "What is the correct syntax for an if statement?", {"if condition then", "if (condition)", "if condition", "condition then"}, "if (condition)", "Conditions", "Easy", "PF");
+    questionList.addQuestion(24, "What is the value of 5 % 2?", {"1", "2", "0", "None"}, "1", "Operators", "Easy", "PF");
+    questionList.addQuestion(25, "Which header file is required for input/output?", {"iostream", "stdlib", "stdio", "math"}, "iostream", "Headers", "Easy", "PF");
+    questionList.addQuestion(26, "Which data type is used to store decimals?", {"int", "float", "char", "bool"}, "float", "Data Types", "Easy", "PF");
+    questionList.addQuestion(27, "What does \"return 0\" signify?", {"Success", "Error", "Infinite loop", "None"}, "Success", "Basics", "Easy", "PF");
+    questionList.addQuestion(28, "What is the output of 4+5*3?", {"15", "27", "19", "None"}, "19", "Operators", "Medium", "PF");
+    questionList.addQuestion(29, "Which operator is used for logical AND?", {"&&", "||", "==", "!"}, "&&", "Operators", "Easy", "PF");
+    questionList.addQuestion(30, "What is the default value of an uninitialized int?", {"0", "garbage", "null", "undefined"}, "garbage", "Variables", "Medium", "PF");
 
-    updateQuestion(questions, 2, "Which data structure is commonly used to implement a queue?",
-                   {"Array", "Linked List", "Circular Queue", "Heap"}, "Linked List", "Queue", "Medium");
-
-    cout << "Updated questions:\n";
-    displayQuestions(questions);
-
-    deleteQuestion(questions, 1);
-
-    cout << "Remaining questions:\n";
-    displayQuestions(questions);
-
-    writeQuestionsToFile(questions, "questions.csv");
+    // Display all questions
+    questionList.displayQuestions();
+   // Write questions to file
+    questionList.writeQuestionsToFile("questions.csv");
 
     return 0;
 }
