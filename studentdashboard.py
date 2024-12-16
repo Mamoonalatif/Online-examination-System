@@ -8,10 +8,10 @@ st.markdown(
     """
     <style>
     [data-testid="stAppViewContainer"] {
-            background-image: url("https://wallpapers.com/images/featured/cute-laptop-background-wskgbnazlfkt4h30.jpg");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+        background-image: url("https://wallpapers.com/images/featured/cute-laptop-background-wskgbnazlfkt4h30.jpg");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
     }
     </style>
     """,
@@ -31,6 +31,12 @@ if "questions_df" not in st.session_state:
 
 if "student_score" not in st.session_state:
     st.session_state.student_score = {}
+
+if "current_question" not in st.session_state:
+    st.session_state.current_question = 0
+
+if "selected_answer" not in st.session_state:
+    st.session_state.selected_answer = None
 
 # Save questions to CSV
 def save_questions():
@@ -69,67 +75,69 @@ questions_df = st.session_state.questions_df
 
 if menu == "Take Quiz":
     st.title("Take a Quiz")
-    
+
     # Student name and course selection (initial page)
-    if "quiz_started" not in st.session_state:
+    if "quiz_started" not in st.session_state or not st.session_state.quiz_started:
         student_name = st.text_input("Enter Your Name")
         selected_subject = st.selectbox("Select course", course_data)
-        
+
         if student_name and selected_subject:
             # Store student name and selected course in session state
             st.session_state.student_name = student_name
             st.session_state.selected_subject = selected_subject
             st.session_state.quiz_started = True
             st.session_state.current_question = 0  # Start from the first question
-            st.session_state.student_score[student_name] = 0  # Initialize score to 0
-            # Move to the quiz section after submission
-            st.experimental_rerun()  # This should be replaced with st.experimental_rerun() if needed
+            st.session_state.selected_answer = None  # Reset selected answer
+            st.session_state.student_score[student_name] = 0  # Initialize score
     else:
         # Proceed to quiz if already started
         student_name = st.session_state.student_name
         selected_subject = st.session_state.selected_subject
-        
+
         # Filter questions based on the selected subject
         subject_questions = questions_df[questions_df["Course"] == selected_subject]
-
         if not subject_questions.empty:
-            score = st.session_state.student_score[student_name]
             total_questions = len(subject_questions)
             question_data = subject_questions.to_dict(orient='records')
 
-            # Show current score at the top
-            st.subheader(f"Your Score: {score}/{total_questions}")
+        # Show current question
+        question_idx = st.session_state.current_question
+        if question_idx < total_questions:
+            q = question_data[question_idx]
+            st.subheader(f"Question {question_idx + 1}")
+            st.write(q["Text"])
 
-            # Show first question
-            if "current_question" not in st.session_state:
-                st.session_state.current_question = 0
+            options = q["Options"].split('|')
+            for i, option in enumerate(options):
+                st.write(f"{chr(65 + i)}. {option}")
 
-            question_idx = st.session_state.current_question
-            if question_idx < total_questions:
-                q = question_data[question_idx]
-                st.subheader(f"Question {question_idx + 1}")
-                st.write(q["Text"])
+            # Option selection using radio buttons
+            selected_option = st.radio("Your Answer", options=[chr(65 + i) for i in range(len(options))], key=f"question_{question_idx}")
 
-                options = q["Options"].split('|')
-                selected_option = st.radio("Your Answer", options=[chr(65 + i) for i in range(len(options))])
-                
-                # Store selected answer in session state
-                if selected_option:
-                    st.session_state.selected_option = selected_option
-                
-                # Handle user answer when "Next" button is clicked
-                if st.button("Next"):
-                    if st.session_state.selected_option == q["CorrectAnswer"]:
-                        score += 1
-                    st.session_state.student_score[student_name] = score
+            # **Update selected_answer immediately after selection**
+            st.session_state.selected_answer = selected_option
 
-                    # Move to next question
-                    st.session_state.current_question += 1
-                    if st.session_state.current_question >= total_questions:
-                        st.write(f"Your final score is {score}/{total_questions}")
-                        st.session_state.quiz_started = False
-                        st.session_state.current_question = 0
-                    st.experimental_rerun()  # After button click, refresh page with updated state
+            # Handle "Next" button click
+            if st.button("Next"):
+                # Update the score if the selected answer is correct
+                if st.session_state.selected_answer:
+                    if st.session_state.selected_answer == q["CorrectAnswer"]:
+                        st.session_state.student_score[student_name] += 1  # Increment score
+
+                # Prepare for the next question
+                st.session_state.current_question += 1  # Move to the next question
+                st.session_state.selected_answer = None  # Reset the answer for the next question
+
+                # After the last question, show the score
+                if st.session_state.current_question >= total_questions:
+                    st.write(f"Your final score is {st.session_state.student_score[student_name]}/{total_questions}")
+                    st.session_state.quiz_started = False
+                    st.session_state.current_question = 0  # Reset to start from the first question for the next quiz
+                    st.session_state.selected_answer = None  # Reset the answer state
+                else:
+                    # No need to reset session state directly here
+                    # Let the next question load naturally
+                    st.rerun()  # This reruns the script and allows a smooth transition to the next question
         else:
             st.write(f"No questions available for {selected_subject}")
 
@@ -138,11 +146,11 @@ elif menu == "View Progress":
 
     if st.session_state.student_score:
         student_name = st.selectbox("Select Student", list(st.session_state.student_score.keys()))
-        
+
         if student_name:
             score = st.session_state.student_score[student_name]
             st.write(f"Score for {student_name}: {score}")
-            
+
             # Plotting progress
             scores = list(st.session_state.student_score.values())
             students = list(st.session_state.student_score.keys())
