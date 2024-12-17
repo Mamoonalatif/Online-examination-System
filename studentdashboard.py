@@ -8,7 +8,6 @@ st.markdown(
     """
     <style>
     [data-testid="stAppViewContainer"] {
-        background-image: url("https://wallpapers.com/images/featured/cute-laptop-background-wskgbnazlfkt4h30.jpg");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -17,6 +16,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
 
 # Constants
 CSV_FILENAME = "questions.csv"
@@ -167,7 +167,7 @@ elif menu == "View Progress":
 
         if student_name:
             student_score = scores_df[scores_df["Student Name"] == student_name]["Score"].iloc[0]
-            st.write(f"Score for {student_name}: {student_score}")
+            
 
             # Plotting progress
             fig, ax = plt.subplots()
