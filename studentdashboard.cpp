@@ -152,8 +152,7 @@ private:
                 q.id = stoi(word);  
 
                 getline(ss, q.text, ',');
-                
-                
+
                 string optionsString;
                 getline(ss, optionsString, ',');
                 stringstream optionsStream(optionsString);
@@ -222,9 +221,10 @@ private:
     }
 
     void saveScore() {
-        ofstream file("student_scores.txt", ios::app);
+        // Save the student's score to students.csv file
+        ofstream file("student_scores.csv", ios::app);
         if (file.is_open()) {
-            file << studentName << ", " << score << endl;
+            file << studentName << "," << score << endl;
             file.close();
         } else {
             cout << "Error opening file to save score!" << endl;
