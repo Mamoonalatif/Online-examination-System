@@ -10,10 +10,10 @@ using namespace std;
 struct Question {
     int id;
     string text;
-    vector<string> options;  // Changed to vector to handle dynamic number of options
+    vector<string> options;  
     char correctOption;
     string concept;
-    string difficulty; // Now a string (easy, medium, hard)
+    string difficulty; 
 };
 
 // Function to map string difficulty to a priority (lower priority value means higher priority)
@@ -21,7 +21,7 @@ int difficultyPriority(const string& difficulty) {
     if (difficulty == "easy") return 1;
     if (difficulty == "medium") return 2;
     if (difficulty == "hard") return 3;
-    return 4; // for unknown difficulty levels
+    return 4; 
 }
 
 // PriorityQueue Class
@@ -149,11 +149,11 @@ private:
 
             try {
                 getline(ss, word, ',');
-                q.id = stoi(word);  // May throw an exception if the value is not numeric
+                q.id = stoi(word);  
 
                 getline(ss, q.text, ',');
                 
-                // Parse options by splitting by '|'
+                
                 string optionsString;
                 getline(ss, optionsString, ',');
                 stringstream optionsStream(optionsString);
@@ -166,14 +166,14 @@ private:
                 q.correctOption = word[0];
                 getline(ss, q.concept, ',');
                 getline(ss, word, ',');
-                q.difficulty = word;  // Read as string (easy, medium, hard)
+                q.difficulty = word;  
                 getline(ss, word, ',');
 
                 if (word == course) pq.insert(q);
             }
             catch (const std::invalid_argument& e) {
                 cout << "Error parsing question ID: " << word << endl;
-                continue;  // Skip invalid questions
+                continue;  
             }
         }
 
@@ -239,14 +239,14 @@ int main() {
     cout << "Welcome to the Student Dashboard!\n";
     cout << "Enter your name: ";
     string studentName;
-    cin.ignore(); // Clear the buffer
+    cin.ignore(); 
     getline(cin, studentName);
 
     cout << "Choose a course: PF, OOP, DSA\n";
     string course;
     cin >> course;
 
-    for (auto& c : course) c = toupper(c); // Convert to uppercase
+    for (auto& c : course) c = toupper(c);
     if (course == "PF" || course == "OOP" || course == "DSA") {
         Quiz quiz(course, studentName);
         quiz.start();
