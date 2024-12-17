@@ -20,6 +20,7 @@ st.markdown(
 
 # Constants
 CSV_FILENAME = "questions.csv"
+SCORE_FILENAME = "student_scores.csv"  # New file to store student scores
 course_data = ["DSA", "OOP", "PF"]
 
 # Initialize session state for questions and progress
@@ -41,6 +42,21 @@ if "selected_answer" not in st.session_state:
 # Save questions to CSV
 def save_questions():
     st.session_state.questions_df.to_csv(CSV_FILENAME, index=False)
+
+# Save student score to CSV
+def save_student_score():
+    # Prepare the data to be stored
+    score_data = {
+        "Student Name": [st.session_state.student_name],
+        "Score": [st.session_state.student_score[st.session_state.student_name]]
+    }
+    score_df = pd.DataFrame(score_data)
+    
+    # Append or create the CSV file with student scores
+    if os.path.exists(SCORE_FILENAME):
+        score_df.to_csv(SCORE_FILENAME, mode='a', header=False, index=False)
+    else:
+        score_df.to_csv(SCORE_FILENAME, index=False)
 
 # Sidebar customization
 st.markdown(
@@ -128,9 +144,10 @@ if menu == "Take Quiz":
                 st.session_state.current_question += 1  # Move to the next question
                 st.session_state.selected_answer = None  # Reset the answer for the next question
 
-                # After the last question, show the score
+                # After the last question, show the score and save it
                 if st.session_state.current_question >= total_questions:
                     st.write(f"Your final score is {st.session_state.student_score[student_name]}/{total_questions}")
+                    save_student_score()  # Save the score to file
                     st.session_state.quiz_started = False
                     st.session_state.current_question = 0  # Reset to start from the first question for the next quiz
                     st.session_state.selected_answer = None  # Reset the answer state
@@ -144,18 +161,17 @@ if menu == "Take Quiz":
 elif menu == "View Progress":
     st.title("Your Progress")
 
-    if st.session_state.student_score:
-        student_name = st.selectbox("Select Student", list(st.session_state.student_score.keys()))
+    if os.path.exists(SCORE_FILENAME):
+        scores_df = pd.read_csv(SCORE_FILENAME)
+        student_name = st.selectbox("Select Student", scores_df["Student Name"].tolist())
 
         if student_name:
-            score = st.session_state.student_score[student_name]
-            st.write(f"Score for {student_name}: {score}")
+            student_score = scores_df[scores_df["Student Name"] == student_name]["Score"].iloc[0]
+            st.write(f"Score for {student_name}: {student_score}")
 
             # Plotting progress
-            scores = list(st.session_state.student_score.values())
-            students = list(st.session_state.student_score.keys())
             fig, ax = plt.subplots()
-            ax.bar(students, scores, color='green')
+            ax.bar(scores_df["Student Name"], scores_df["Score"], color='green')
             ax.set_xlabel('Students')
             ax.set_ylabel('Scores')
             ax.set_title('Student Progress')
