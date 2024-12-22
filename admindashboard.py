@@ -2,6 +2,50 @@ import streamlit as st
 import pandas as pd
 import os
 from PIL import Image, ImageDraw
+from flask import Flask, request, jsonify
+import ctypes
+
+# Load the compiled shared library
+questions_lib = ctypes.CDLL('./libquestions.so')
+
+# Define the Flask app
+app = Flask(__name__)
+
+@app.route('/add_question', methods=['POST'])
+def add_question():
+    data = request.json
+    result = questions_lib.add_question(
+        data['id'],
+        data['text'].encode('utf-8'),
+        data['options'].encode('utf-8'),
+        data['correctAnswer'].encode('utf-8'),
+        data['concept'].encode('utf-8'),
+        data['difficulty'].encode('utf-8'),
+        data['course'].encode('utf-8')
+    )
+    return jsonify({"message": ctypes.c_char_p(result).value.decode('utf-8')})
+
+@app.route('/modify_question', methods=['POST'])
+def modify_question():
+    data = request.json
+    result = questions_lib.modify_question(
+        data['id'],
+        data['newText'].encode('utf-8')
+    )
+    return jsonify({"message": ctypes.c_char_p(result).value.decode('utf-8')})
+
+@app.route('/delete_question', methods=['POST'])
+def delete_question():
+    data = request.json
+    result = questions_lib.delete_question(data['id'])
+    return jsonify({"message": ctypes.c_char_p(result).value.decode('utf-8')})
+
+@app.route('/get_questions', methods=['GET'])
+def get_questions():
+    result = questions_lib.get_all_questions()
+    return jsonify({"questions": ctypes.c_char_p(result).value.decode('utf-8')})
+
+
 st.markdown(
     """
     <style>
@@ -81,75 +125,52 @@ if menu == "Manage Questions":
     elif manage_questions_option == "Add Question":
         st.subheader("Add New Question")
         with st.form("add_question_form"):
-            question_id = st.number_input("Question ID", min_value=1, step=1)
-            text = st.text_area("Question Text")
-            options = st.text_area("Options (separate with '|')")
-            correct_answer = st.text_input("Correct Answer")
-            concept = st.text_input("Concept")
-            difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"])
-            subject = st.selectbox("Subject", subjects_data)
-            submit_add = st.form_submit_button("Add Question")
-
-            if submit_add:
+             question_id = st.number_input("Question ID", min_value=1, step=1)
+          text = st.text_area("Question Text")
+         options = st.text_area("Options (separate with '|')")
+         correct_answer = st.text_input("Correct Answer")
+         concept = st.text_input("Concept")
+         difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"])
+         subject = st.selectbox("Subject", subjects_data)
+         submit_add = st.form_submit_button("Add Question")
+        if submit_add:
                 if not questions_df[questions_df["ID"] == question_id].empty:
                     st.error("A question with this ID already exists.")
                 else:
-                    new_question = {
-                        "ID": question_id,
-                        "Text": text,
-                        "Options": options,
-                        "CorrectAnswer": correct_answer,
-                        "Concept": concept,
-                        "Difficulty": difficulty,
-                        "Subject": subject
-                    }
-                    st.session_state.questions_df = questions_df.append(new_question, ignore_index=True)
-                    save_questions()
+                     message = add_question_to_library(
+                question_id, text, options, correct_answer, concept, difficulty, subject
+                     )
                     st.success("Question added successfully!")
 
-    elif manage_questions_option == "Modify Question":
-        st.subheader("Modify an Existing Question")
-        if not questions_df.empty:
-            selected_id = st.selectbox("Select Question ID", questions_df["ID"].tolist())
-            selected_question = questions_df[questions_df["ID"] == selected_id].iloc[0]
+elif manage_questions_option == "Modify Question":
+    st.subheader("Modify an Existing Question")
+    if not questions_df.empty:
+        selected_id = st.selectbox("Select Question ID", questions_df["ID"].tolist())
+        selected_question = questions_df[questions_df["ID"] == selected_id].iloc[0]
 
-            with st.form("modify_question_form"):
-                updated_text = st.text_area("Question Text", value=selected_question["Text"])
-                updated_options = st.text_area("Options (separate with '|')", value=selected_question["Options"])
-                updated_correct_answer = st.text_input("Correct Answer", value=selected_question["CorrectAnswer"])
-                updated_concept = st.text_input("Concept", value=selected_question["Concept"])
-                updated_difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"], index=["Easy", "Medium", "Hard"].index(selected_question["Difficulty"]))
+        with st.form("modify_question_form"):
+            updated_text = st.text_area("Question Text", value=selected_question["Text"])
+            modify = st.form_submit_button("Modify Question")
 
-                selected_subject = selected_question["Subject"]
-                if selected_subject not in subjects_data:
-                    selected_subject = subjects_data[0]  # Default to first subject if not found
-                updated_subject = st.selectbox("Subject", subjects_data, index=subjects_data.index(selected_subject))
-
-                modify = st.form_submit_button("Modify Question")
-
-                if modify:
-                    st.session_state.questions_df.loc[st.session_state.questions_df["ID"] == selected_id, ["Text", "Options", "CorrectAnswer", "Concept", "Difficulty", "Subject"]] = [
-                        updated_text, updated_options, updated_correct_answer, updated_concept, updated_difficulty, updated_subject
-                    ]
-                    save_questions()
-                    st.success("Question modified successfully!")
-        else:
-            st.write("No questions available to modify.")
-
-    elif manage_questions_option == "Delete Question":
+            if modify:
+                message = modify_question_in_library(selected_id, updated_text)
+                st.success("Question modified successfully!")
+    else:
+        st.write("No questions available to modify.")              
+   elif manage_questions_option == "Delete Question":
         st.subheader("Delete an Existing Question")
-        if not questions_df.empty:
-            selected_id = st.selectbox("Select Question ID", questions_df["ID"].tolist())
-            selected_question = questions_df[questions_df["ID"] == selected_id].iloc[0]
+       if not questions_df.empty:
+          selected_id = st.selectbox("Select Question ID", questions_df["ID"].tolist())
 
-            delete = st.button("Delete Question")
-
-            if delete:
-                st.session_state.questions_df = st.session_state.questions_df[st.session_state.questions_df["ID"] != selected_id]
-                save_questions()
-                st.success("Question deleted successfully!")
+         delete = st.button("Delete Question")
+        if delete:
+            message = delete_question_from_library(selected_id)
+              st.success("Question deleted successfully!")
         else:
-            st.write("No questions available to delete.")
+        st.write("No questions available to delete.")
+
+  
+                st.success("Question deleted successfully!")
 
 elif menu == "Settings":
     st.title("Settings")
