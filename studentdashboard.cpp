@@ -6,7 +6,6 @@
 
 using namespace std;
 
-// Structure to hold question data
 struct Question {
     int id;
     string text;
@@ -16,15 +15,6 @@ struct Question {
     string difficulty; 
 };
 
-// Function to map string difficulty to a priority (lower priority value means higher priority)
-int difficultyPriority(const string& difficulty) {
-    if (difficulty == "easy") return 1;
-    if (difficulty == "medium") return 2;
-    if (difficulty == "hard") return 3;
-    return 4; 
-}
-
-// PriorityQueue Class
 class PriorityQueue {
 public:
     Question data[1000];
@@ -39,7 +29,7 @@ public:
             swap(data[i], data[(i - 1) / 2]);
             i = (i - 1) / 2;
         }
-    }
+    }//insert
 
     Question extractMin() {
         if (size == 0) return {};
@@ -47,15 +37,15 @@ public:
         data[0] = data[--size];
         heapify(0);
         return root;
-    }
+    }//extractMin
 
     Question peek() {
         return size > 0 ? data[0] : Question();
-    }
+    }//peek
 
     bool isEmpty() {
         return size == 0;
-    }
+    }//isEmpty
 
 private:
     void heapify(int i) {
@@ -72,10 +62,10 @@ private:
             swap(data[i], data[smallest]);
             heapify(smallest);
         }
-    }
+    }//heapify
 };
 
-// Linked List Class to track used question IDs
+
 class UsedQuestions {
 public:
     struct Node {
@@ -91,7 +81,7 @@ public:
         Node* newNode = new Node(id);
         newNode->next = head;
         head = newNode;
-    }
+    }//insert
 
     bool contains(int id) {
         Node* current = head;
@@ -100,7 +90,7 @@ public:
             current = current->next;
         }
         return false;
-    }
+    }//contains
 
     ~UsedQuestions() {
         while (head) {
@@ -108,13 +98,13 @@ public:
             head = head->next;
             delete temp;
         }
-    }
+    }//destructor
 
 private:
     Node* head;
 };
 
-// Quiz Class
+
 class Quiz {
 public:
     Quiz(const string& course, const string& studentName)
@@ -130,7 +120,7 @@ public:
 
         askQuestions();
         saveScore();
-    }
+    }//start
 
 private:
     string course;
@@ -177,7 +167,7 @@ private:
         }
 
         file.close();
-    }
+    }//loadQuestions
 
     void askQuestions() {
         Question currentQuestion = pq.extractMin();
@@ -207,7 +197,7 @@ private:
                 }
             } else break;
         }
-    }
+    }//askQuestions
 
     bool askQuestion(const Question& q) {
         cout << "\nQuestion: " << q.text << endl;
@@ -218,10 +208,9 @@ private:
         char answer;
         cin >> answer;
         return toupper(answer) == q.correctOption;
-    }
+    }//askQuestion
 
     void saveScore() {
-        // Save the student's score to students.csv file
         ofstream file("student_scores.csv", ios::app);
         if (file.is_open()) {
             file << studentName << "," << score << endl;
@@ -231,10 +220,16 @@ private:
         }
 
         cout << "\nQuiz Finished! Your Score: " << score << endl;
-    }
+    }//saveScore
 };
 
-// Main function
+int difficultyPriority(const string& difficulty) {
+    if (difficulty == "easy") return 1;
+    if (difficulty == "medium") return 2;
+    if (difficulty == "hard") return 3;
+    return 4; 
+}//difficulty priority
+
 int main() {
     cout << "Welcome to the Student Dashboard!\n";
     cout << "Enter your name: ";
