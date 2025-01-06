@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/15c388f8-ff59-4ab6-a70c-235d42febbc9)# PANDAPROCTOR
+# PANDAPROCTOR
 (ONLINE EXAMINATION SYSTEM)
 # Online Examination System
 
