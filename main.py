@@ -228,7 +228,9 @@ def admin_dashboard():
                         st.error("A question with this ID already exists.")
                     else:
                         new_data = {"ID": question_id, "Text": text, "Options": options, "CorrectAnswer": correct_answer, "Concept": concept, "Difficulty": difficulty, "Subject": subject}
-                        st.session_state.questions_df = st.session_state.questions_df.append(new_data, ignore_index=True)
+                        new_row = pd.DataFrame([new_data])
+                        st.session_state.questions_df = pd.concat([st.session_state.questions_df, new_row], ignore_index=True)
+
                         save_questions()
                         st.success("Question added successfully!")
 

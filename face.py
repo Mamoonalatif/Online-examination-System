@@ -15,7 +15,7 @@ def detect_face():
     if not ret:
         return jsonify({"error": "Unable to capture frame from webcam."}), 500
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRA)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     faces = face_cascade.detectMultiScale(gray, 1.1, 4)
 

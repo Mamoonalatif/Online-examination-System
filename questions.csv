@@ -1,29 +1,29 @@
-ID,Text,Options,CorrectAnswer,Concept,Difficulty,Course
-1,What is the time complexity of Binary Search?,O(n)|O(log n)|O(n^2)|O(1),B,Binary Search,Easy,DSA
-2,Which data structure is used to implement a queue?,Array|Linked List|Stack|Heap,B,Queue,Medium,DSA
-3,What is the space complexity of Merge Sort?,O(n)|O(log n)|O(n log n)|O(1),A,Merge Sort,Hard,DSA
-5,What is the time complexity of QuickSort in the worst case?,O(n)|O(n log n)|O(n^2)|O(log n),C,Sorting,Hard,DSA
-7,What is the best-case time complexity of Bubble Sort?,O(n)|O(n log n)|O(n^2)|O(1),A,Sorting,Easy,DSA
-8,What does BFS stand for?,Breadth-First Search|Binary First Search|Best First Search|Bubble First Sort,A,Graph Algorithms,Medium,DSA
-9,What is the space complexity of the Breadth-First Search algorithm?,O(n)|O(n log n)|O(log n)|O(1),A,Graph Algorithms,Medium,DSA
-10,Which of the following is a divide and conquer algorithm?,QuickSort|Bubble Sort|Selection Sort|Insertion Sort,A,Sorting,Medium,DSA
-11,Which of the following is the correct syntax for a for loop?,for(i=0; i<5; i++)|for(i=0; i<5; i++){}|for(i=0; i<5; i){}|None of the above,A,For Loops,Medium,PF
-12,What is the correct data type to store a single character in C++?,char|int|string|float,A,Data Types,Easy,PF
-13,Which of the following is used to break out of a loop?,break|continue|exit|return,A,Loop Control,Easy,PF
-14,Which operator is used to compare two values in C++?,=|==|<>|!=,B,For Loops,Hard,PF
-15,Which of these is the correct syntax to define a function in C++?,void function()|function void()|void function{}|function() void{},A,Functions,Medium,PF
-16,What is the output of 'cout << 10 / 3;' in C++?,3|3.33|Error|10/3,A,Basic Output,Easy,PF
-17,Which keyword is used to define a constant value?,const|final|static|define,A,Constants,Medium,PF
-18,Which of the following is NOT a valid data type in C++?,int|double|string|number,D,Data Types,Easy,PF
-19,How can you access a member of a class in C++?,.|::|->|*,A,For Loops,Easy,PF
-20,What is the default value of an uninitialized static variable?,0|NULL|undefined|Random Value,A,Static Variables,Medium,PF
-21,What is inheritance in OOP?,Ability to create new classes from existing ones|Ability to modify private variables|Ability to share methods between classes|Ability to create new instances,A,Inheritance,Hard,OOP
-22,Which of the following is NOT a feature of OOP?,Encapsulation|Abstraction|Inheritance|Polymorphism,D,OOP Features,Easy,OOP
-23,Which OOP principle allows an object to take on multiple forms?,Polymorphism|Abstraction|Inheritance|Encapsulation,A,Polymorphism,Hard,OOP
-24,Which OOP principle allows hiding implementation details?,Encapsulation|Abstraction|Inheritance|Polymorphism,B,OOP Principles,Hard,OOP
-25,What is a constructor in C++?,A special method for initializing objects|A method to destroy objects|A method to declare variables|A method to display output,A,Constructor,Medium,OOP
-26,What is the purpose of the 'this' pointer in C++?,To refer to the current object|To store a pointer to a member variable|To create a new object|To delete an object,A,This Pointer,Medium,OOP
-27,What is polymorphism in OOP?,Objects taking multiple forms|Objects hiding data|Objects inheriting properties|Objects using multiple classes,A,Polymorphism,Hard,OOP
-28,What is a virtual function?,A function that can be overridden in derived classes|A function that cannot be overridden|A function without any implementation|A function used for destructors,A,Virtual Functions,Hard,OOP
-29,What is an abstract class?,A class that cannot be instantiated|A class with no methods|A class with only private methods|A class with no data members,A,Abstract Classes,Medium,OOP
-30,What is the purpose of encapsulation?,To hide the internal state and protect the data|To allow inheritance|To implement polymorphism|To provide abstraction,A,Encapsulation,Hard,OOP
+ID,Text,Options,CorrectAnswer,Concept,Difficulty,Course,Subject
+1,What is the time complexity of Binary Search?,O(n)|O(log n)|O(n^2)|O(1),B,Binary Search,Easy,DSA,
+2,Which data structure is used to implement a queue?,Array|Linked List|Stack|Heap,B,Queue,Medium,DSA,
+3,What is the space complexity of Merge Sort?,O(n)|O(log n)|O(n log n)|O(1),A,Merge Sort,Hard,DSA,
+5,What is the time complexity of QuickSort in the worst case?,O(n)|O(n log n)|O(n^2)|O(log n),C,Sorting,Hard,DSA,
+7,What is the best-case time complexity of Bubble Sort?,O(n)|O(n log n)|O(n^2)|O(1),A,Sorting,Easy,DSA,
+8,What does BFS stand for?,Breadth-First Search|Binary First Search|Best First Search|Bubble First Sort,A,Graph Algorithms,Medium,DSA,
+9,What is the space complexity of the Breadth-First Search algorithm?,O(n)|O(n log n)|O(log n)|O(1),A,Graph Algorithms,Medium,DSA,
+10,Which of the following is a divide and conquer algorithm?,QuickSort|Bubble Sort|Selection Sort|Insertion Sort,A,Sorting,Medium,DSA,
+11,Which of the following is the correct syntax for a for loop?,for(i=0; i<5; i++)|for(i=0; i<5; i++){}|for(i=0; i<5; i){}|None of the above,A,For Loops,Medium,PF,
+12,What is the correct data type to store a single character in C++?,char|int|string|float,A,Data Types,Easy,PF,
+13,Which of the following is used to break out of a loop?,break|continue|exit|return,A,Loop Control,Easy,PF,
+14,Which operator is used to compare two values in C++?,=|==|<>|!=,B,For Loops,Hard,PF,
+15,Which of these is the correct syntax to define a function in C++?,void function()|function void()|void function{}|function() void{},A,Functions,Medium,PF,
+16,What is the output of 'cout << 10 / 3;' in C++?,3|3.33|Error|10/3,A,Basic Output,Easy,PF,
+17,Which keyword is used to define a constant value?,const|final|static|define,A,Constants,Medium,PF,
+18,Which of the following is NOT a valid data type in C++?,int|double|string|number,D,Data Types,Easy,PF,
+19,How can you access a member of a class in C++?,.|::|->|*,A,For Loops,Easy,PF,
+20,What is the default value of an uninitialized static variable?,0|NULL|undefined|Random Value,A,Static Variables,Medium,PF,
+21,What is inheritance in OOP?,Ability to create new classes from existing ones|Ability to modify private variables|Ability to share methods between classes|Ability to create new instances,A,Inheritance,Hard,OOP,
+22,Which of the following is NOT a feature of OOP?,Encapsulation|Abstraction|Inheritance|Polymorphism,D,OOP Features,Easy,OOP,
+23,Which OOP principle allows an object to take on multiple forms?,Polymorphism|Abstraction|Inheritance|Encapsulation,A,Polymorphism,Hard,OOP,
+24,Which OOP principle allows hiding implementation details?,Encapsulation|Abstraction|Inheritance|Polymorphism,B,OOP Principles,Hard,OOP,
+25,What is a constructor in C++?,A special method for initializing objects|A method to destroy objects|A method to declare variables|A method to display output,A,Constructor,Medium,OOP,
+26,What is the purpose of the 'this' pointer in C++?,To refer to the current object|To store a pointer to a member variable|To create a new object|To delete an object,A,This Pointer,Medium,OOP,
+27,What is polymorphism in OOP?,Objects taking multiple forms|Objects hiding data|Objects inheriting properties|Objects using multiple classes,A,Polymorphism,Hard,OOP,
+28,What is a virtual function?,A function that can be overridden in derived classes|A function that cannot be overridden|A function without any implementation|A function used for destructors,A,Virtual Functions,Hard,OOP,
+29,What is an abstract class?,A class that cannot be instantiated|A class with no methods|A class with only private methods|A class with no data members,A,Abstract Classes,Medium,OOP,
+30,What is the purpose of encapsulation?,To hide the internal state and protect the data|To allow inheritance|To implement polymorphism|To provide abstraction,A,Encapsulation,Hard,OOP,
