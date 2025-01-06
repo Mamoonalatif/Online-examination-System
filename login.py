@@ -1,7 +1,6 @@
 import streamlit as st
 import subprocess
 
-# Set page configuration
 st.set_page_config(
     page_title="PandaProctor Login",
     page_icon="🐼",
@@ -64,16 +63,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Function to handle login and registration pages
 def login_page():
     if "show_register_form" not in st.session_state:
-        st.session_state.show_register_form = False  # Initially, show login form
+        st.session_state.show_register_form = False  
 
-    # Header
     st.markdown('<div class="header">🐼 Welcome to PandaProctor 🐼</div>', unsafe_allow_html=True)
 
     if not st.session_state.show_register_form:
-        # Login form
         st.markdown('<div class="subheader">Please choose your login type</div>', unsafe_allow_html=True)
         user_type = st.radio("I want to log in as:", ("Student", "Admin"), horizontal=True)
 
@@ -96,9 +92,8 @@ def login_page():
                 st.error("Please enter both username and password.")
 
         if st.button("Register Now"):
-            st.session_state.show_register_form = True  # Switch to registration form
+            st.session_state.show_register_form = True  
     else:
-        # Registration form
         st.markdown('<div class="subheader">Create a new account</div>', unsafe_allow_html=True)
         register_user_type = st.radio("Register as:", ("Student", "Admin"), horizontal=True)
 
@@ -115,14 +110,13 @@ def login_page():
                         capture_output=True, text=True, check=True
                     )
                     st.success("Registration successful! You can now log in.")
-                    st.session_state.show_register_form = False  # Switch back to login form
+                    st.session_state.show_register_form = False  
                 except subprocess.CalledProcessError as e:
                     st.error(f"Error: {e.stderr}")
             else:
                 st.error("Please enter both username and password.")
 
         if st.button("Back to Login"):
-            st.session_state.show_register_form = False  # Switch back to login form
+            st.session_state.show_register_form = False  
 
-# Run the login page function
 login_page()

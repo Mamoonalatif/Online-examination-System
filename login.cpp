@@ -9,7 +9,7 @@ struct HashMap
         string key, value;
         Node *next;
     };
-    Node *table[100];
+    Node *table[10];
 
     HashMap() { fill(begin(table), end(table), nullptr); }
 
@@ -39,7 +39,7 @@ struct HashMap
     void saveToFile(const string &filename)
     {
         ofstream file(filename, ios::app);
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 10; i++)
             for (Node *current = table[i]; current; current = current->next)
                 file << current->key << " " << current->value << "\n";
     }//savetoFile

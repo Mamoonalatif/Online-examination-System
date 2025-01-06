@@ -2,83 +2,21 @@ import streamlit as st
 import pandas as pd
 import os
 from PIL import Image, ImageDraw
-from flask import Flask, request, jsonify
-import ctypes
+import matplotlib.pyplot as plt
 
-# Load the compiled shared library
-questions_lib = ctypes.CDLL('./libquestions.so')
-
-# Define the Flask app
-app = Flask(__name__)
-
-@app.route('/add_question', methods=['POST'])
-def add_question():
-    data = request.json
-    result = questions_lib.add_question(
-        data['id'],
-        data['text'].encode('utf-8'),
-        data['options'].encode('utf-8'),
-        data['correctAnswer'].encode('utf-8'),
-        data['concept'].encode('utf-8'),
-        data['difficulty'].encode('utf-8'),
-        data['course'].encode('utf-8')
-    )
-    return jsonify({"message": ctypes.c_char_p(result).value.decode('utf-8')})
-
-@app.route('/modify_question', methods=['POST'])
-def modify_question():
-    data = request.json
-    result = questions_lib.modify_question(
-        data['id'],
-        data['newText'].encode('utf-8')
-    )
-    return jsonify({"message": ctypes.c_char_p(result).value.decode('utf-8')})
-
-@app.route('/delete_question', methods=['POST'])
-def delete_question():
-    data = request.json
-    result = questions_lib.delete_question(data['id'])
-    return jsonify({"message": ctypes.c_char_p(result).value.decode('utf-8')})
-
-@app.route('/get_questions', methods=['GET'])
-def get_questions():
-    result = questions_lib.get_all_questions()
-    return jsonify({"questions": ctypes.c_char_p(result).value.decode('utf-8')})
-
-
-st.markdown(
-    """
-    <style>
-
-[data-testid="stAppViewContainer"] {
-            background-image: url("https://wallpapers.com/images/featured/cute-laptop-background-wskgbnazlfkt4h30.jpg");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        
-        }
-         </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# Constants
 CSV_FILENAME = "questions.csv"
+STUDENT_SCORES_FILENAME = "student_scores.csv"
 subjects_data = ["DSA", "OOP", "PF"]
 
-# Initialize session state for questions
 if "questions_df" not in st.session_state:
     if os.path.exists(CSV_FILENAME):
         st.session_state.questions_df = pd.read_csv(CSV_FILENAME)
     else:
         st.session_state.questions_df = pd.DataFrame(columns=["ID", "Text", "Options", "CorrectAnswer", "Concept", "Difficulty", "Subject"])
 
-# Save questions to CSV
 def save_questions():
     st.session_state.questions_df.to_csv(CSV_FILENAME, index=False)
 
-# Sidebar customization
 st.markdown(
     """<style>
     [data-testid="stSidebar"] {
@@ -92,7 +30,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Sidebar
+
 st.sidebar.title("Panda Proctor Admin Dashboard")
 image_path = "C:\\Users\\mamoo\\Downloads\\PandaProctor\\panda1.jpg"
 if os.path.exists(image_path):
@@ -104,15 +42,16 @@ if os.path.exists(image_path):
     image.putalpha(mask)
     st.sidebar.image(image, use_container_width=False)
 
-menu = st.sidebar.radio("Navigation", ["Dashboard", "Manage Questions", "Settings"])
+menu = st.sidebar.radio("Navigation", ["Dashboard", "Manage Questions", "Settings", "Student Progress", "Log Out"])
 
-# Load the questions from session state
 questions_df = st.session_state.questions_df
 
-if menu == "Manage Questions":
-    st.title("Manage Questions")
+if menu == "Dashboard":
+    st.title("Dashboard")
+    st.write("Welcome to the Admin Dashboard.")
 
-    # Sidebar options for Manage Questions
+elif menu == "Manage Questions":
+    st.title("Manage Questions")
     manage_questions_option = st.sidebar.radio("Select an Action", ["Display Questions", "Add Question", "Modify Question", "Delete Question"])
 
     if manage_questions_option == "Display Questions":
@@ -125,52 +64,92 @@ if menu == "Manage Questions":
     elif manage_questions_option == "Add Question":
         st.subheader("Add New Question")
         with st.form("add_question_form"):
-             question_id = st.number_input("Question ID", min_value=1, step=1)
-          text = st.text_area("Question Text")
-         options = st.text_area("Options (separate with '|')")
-         correct_answer = st.text_input("Correct Answer")
-         concept = st.text_input("Concept")
-         difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"])
-         subject = st.selectbox("Subject", subjects_data)
-         submit_add = st.form_submit_button("Add Question")
-        if submit_add:
+            question_id = st.number_input("Question ID", min_value=1, step=1)
+            text = st.text_area("Question Text")
+            options = st.text_area("Options (separate with '|')")
+            correct_answer = st.text_input("Correct Answer")
+            concept = st.text_input("Concept")
+            difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"])
+            subject = st.selectbox("Subject", subjects_data)
+            submit_add = st.form_submit_button("Add Question")
+
+            if submit_add:
                 if not questions_df[questions_df["ID"] == question_id].empty:
                     st.error("A question with this ID already exists.")
                 else:
-                     message = add_question_to_library(
-                question_id, text, options, correct_answer, concept, difficulty, subject
-                     )
+                    new_question = {
+                        "ID": question_id,
+                        "Text": text,
+                        "Options": options,
+                        "CorrectAnswer": correct_answer,
+                        "Concept": concept,
+                        "Difficulty": difficulty,
+                        "Subject": subject
+                    }
+                    st.session_state.questions_df = questions_df.append(new_question, ignore_index=True)
+                    save_questions()
                     st.success("Question added successfully!")
 
-elif manage_questions_option == "Modify Question":
-    st.subheader("Modify an Existing Question")
-    if not questions_df.empty:
-        selected_id = st.selectbox("Select Question ID", questions_df["ID"].tolist())
-        selected_question = questions_df[questions_df["ID"] == selected_id].iloc[0]
+    elif manage_questions_option == "Modify Question":
+        st.subheader("Modify an Existing Question")
+        if not questions_df.empty:
+            selected_id = st.selectbox("Select Question ID", questions_df["ID"].tolist())
+            selected_question = questions_df[questions_df["ID"] == selected_id].iloc[0]
 
-        with st.form("modify_question_form"):
-            updated_text = st.text_area("Question Text", value=selected_question["Text"])
-            modify = st.form_submit_button("Modify Question")
+            with st.form("modify_question_form"):
+                updated_text = st.text_area("Question Text", value=selected_question["Text"])
+                updated_options = st.text_area("Options (separate with '|')", value=selected_question["Options"])
+                updated_correct_answer = st.text_input("Correct Answer", value=selected_question["CorrectAnswer"])
+                updated_concept = st.text_input("Concept", value=selected_question["Concept"])
+                updated_difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"], index=["Easy", "Medium", "Hard"].index(selected_question["Difficulty"]))
 
-            if modify:
-                message = modify_question_in_library(selected_id, updated_text)
-                st.success("Question modified successfully!")
-    else:
-        st.write("No questions available to modify.")              
-   elif manage_questions_option == "Delete Question":
-        st.subheader("Delete an Existing Question")
-       if not questions_df.empty:
-          selected_id = st.selectbox("Select Question ID", questions_df["ID"].tolist())
+                selected_subject = selected_question["Subject"]
+                if selected_subject not in subjects_data:
+                    selected_subject = subjects_data[0]  
+                updated_subject = st.selectbox("Subject", subjects_data, index=subjects_data.index(selected_subject))
 
-         delete = st.button("Delete Question")
-        if delete:
-            message = delete_question_from_library(selected_id)
-              st.success("Question deleted successfully!")
+                modify = st.form_submit_button("Modify Question")
+
+                if modify:
+                    st.session_state.questions_df.loc[st.session_state.questions_df["ID"] == selected_id, ["Text", "Options", "CorrectAnswer", "Concept", "Difficulty", "Subject"]] = [
+                        updated_text, updated_options, updated_correct_answer, updated_concept, updated_difficulty, updated_subject
+                    ]
+                    save_questions()
+                    st.success("Question modified successfully!")
         else:
-        st.write("No questions available to delete.")
+            st.write("No questions available to modify.")
 
-  
+    elif manage_questions_option == "Delete Question":
+        st.subheader("Delete an Existing Question")
+        if not questions_df.empty:
+            selected_id = st.selectbox("Select Question ID", questions_df["ID"].tolist())
+            selected_question = questions_df[questions_df["ID"] == selected_id].iloc[0]
+
+            delete = st.button("Delete Question")
+
+            if delete:
+                st.session_state.questions_df = st.session_state.questions_df[st.session_state.questions_df["ID"] != selected_id]
+                save_questions()
                 st.success("Question deleted successfully!")
+        else:
+            st.write("No questions available to delete.")
+
+elif menu == "Student Progress":
+    st.title("Student Progress")
+    st.subheader("View Student Scores")
+    
+    if os.path.exists(STUDENT_SCORES_FILENAME):
+        student_scores_df = pd.read_csv(STUDENT_SCORES_FILENAME)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.bar(student_scores_df["Student Name"], student_scores_df["Score"], color='skyblue')
+        ax.set_xlabel('Student Name')
+        ax.set_ylabel('Score')
+        ax.set_title('Student Progress')
+        plt.xticks(rotation=45, ha='right')
+
+        st.pyplot(fig)  
+    else:
+        st.write("No student scores available.")
 
 elif menu == "Settings":
     st.title("Settings")
